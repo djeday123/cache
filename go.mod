@@ -1,3 +1,3 @@
-module pr_zad3
+module cache
 
 go 1.18
