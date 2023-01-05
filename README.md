@@ -16,17 +16,18 @@ it is helpful, please give me a star
 
 ##### Go version >= 1.18 (recommend)
 
-
+```go
 // By github
 go get -u github.com/djeday123/cache
 
 import (
 	"github.com/djeday123/cache"
 )
+```
 
+#### Usage and example
 
-Usage and example
-
+```go
 ##### Create cache instance
 
 cache := cache.New()
@@ -44,3 +45,4 @@ if err != nil {
 
 ##### Example of delete row by the key in cache
 cache.Delete("userId")
+```
