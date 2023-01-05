@@ -24,22 +24,3 @@ import (
 	"github.com/djeday123/cache"
 )
 
-#### Usage and example
-
-##### Create cache instance
-
-cache := cache.New()
-
-##### Example of set key (string) and value (int) in cache
-cache.Set("userId", 42)
-
-##### Example of get value of the key in cache
-userId, err := cache.Get("userId")
-if err != nil {
-  fmt.Printf("key userId doesnt exist \n")
-} else {
-  fmt.Println(userId)
-}
-
-##### Example of delete row by the key in cache
-cache.Delete("userId")
