@@ -16,7 +16,7 @@ it is helpful, please give me a star
 
 ##### Go version >= 1.18 (recommend)
 
-```go
+
 // By github
 go get -u github.com/djeday123/cache
 
