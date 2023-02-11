@@ -1,39 +1,66 @@
 package cache
 
 import (
-	"errors"
+	"fmt"
+	"sync"
+	"time"
 )
 
-var usersCache2 = map[string]int{}
-
-type cache struct {
-	name_p     string
-	value_p    int
-	usersCache map[string]int
+type items struct {
+	value int
+	exp   time.Time
 }
 
+type cache struct {
+	items map[string]items
+	mu    *sync.Mutex
+}
+
+const ttl time.Duration = 5 * time.Second
+
 func New() cache {
-	i := cache{name_p: "n", value_p: 0}
-	i.usersCache = make(map[string]int)
+	item1 := make(map[string]items)
+	i := cache{
+		items: item1,
+		mu:    new(sync.Mutex),
+	}
+
 	return i
 }
 
-func (user *cache) Set(name string, id int) {
-	user.name_p = name
-	user.value_p = id
-	user.usersCache[name] = id
-	usersCache2[name] = id
+func (user *cache) Set(name string, id int) error {
+
+	user.mu.Lock()
+	defer user.mu.Unlock()
+	user.items[name] = items{
+		value: id,
+		exp:   time.Now().Add(ttl),
+	}
+	return nil
 }
 
-func (user *cache) Get(name string) (int, error) {
-	i, ok := user.usersCache[name]
+func (user *cache) Get(name string) (int, int64, error) {
+
+	user.mu.Lock()
+	defer user.mu.Unlock()
+	i, ok := user.items[name]
+
 	if ok {
-		return i, nil
+		ttl_check := i.exp.Unix()
+
+		if ttl_check < time.Now().Unix() {
+			delete(user.items, name)
+			return -1, 0, fmt.Errorf("key %q expired", name)
+		} else {
+			return i.value, ttl_check, nil
+		}
 	}
 
-	return -1, errors.New("key not exist")
+	return -1, 0, fmt.Errorf("key %q not exist", name)
 }
 
 func (user *cache) Delete(name string) {
-	delete(user.usersCache, name)
+	user.mu.Lock()
+	defer user.mu.Unlock()
+	delete(user.items, name)
 }
